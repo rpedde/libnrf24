@@ -324,6 +324,7 @@ uint8_t rf24_initialize(rf24_t * this, char * spi_dev, uint8_t ce_pin, uint8_t i
   gpio_export_wait(this->ce_pin);
   gpio_export_wait(this->csn_pin);
   gpio_set_direction(this->ce_pin, GPIO_PIN_OUTPUT);
+  gpio_set_direction(this->csn_pin, GPIO_PIN_OUTPUT);
 
   /* Minimum ideal SPI bus speed is 2x data rate
    * If we assume 2Mbs data rate and 16Mhz clock, a
