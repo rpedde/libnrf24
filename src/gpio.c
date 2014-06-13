@@ -190,12 +190,6 @@ uint8_t gpio_poll(uint8_t gpio_pin, uint8_t gpio_edge, void(* callback)(void * a
     return -1;
   }
 
-
-  ioctl(fd, FIONREAD, &count);
-  for (i = 0; i < count; i++) {
-    read(fd, &val, 1);
-  }
-
   polls.fd = fd;
   polls.events = POLLPRI;
 
