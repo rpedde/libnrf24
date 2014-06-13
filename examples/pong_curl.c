@@ -25,6 +25,7 @@ void post_data(int node, float temp, float voltage)
   curl_easy_setopt(curl, CURLOPT_VERBOSE, 0);
   curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1);
   curl_easy_setopt(curl, CURLOPT_POST, 1);
+  curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, 0);
   curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
   curl_easy_setopt(curl, CURLOPT_USERPWD, HTTP_AUTH);
 
