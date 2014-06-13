@@ -177,7 +177,9 @@ void rf24_send_ack_on_pipe(rf24_t * this, uint8_t pipe_no, void * buf, uint8_t l
 void rf24_irq_poll(rf24_t * this, void(* callback)(void * radio))
 {
   assert(this->irq_pin);
-  gpio_poll(this->irq_pin, GPIO_EDGE_FALLING, callback, (void *) this);
+  if (gpio_poll(this->irq_pin, GPIO_EDGE_FALLING, callback, (void *) this) == -1) {
+    fprintf(stderr, "[rf24] Error registering irq callback on pin %d\n", this->irq_pin);
+  }
 }
 
 uint8_t rf24_send(rf24_t * this, void * buf, uint8_t len)
