@@ -95,7 +95,7 @@ uint8_t gpio_set_direction(uint8_t gpio_pin, uint8_t gpio_direction)
     return -1;
   }
 
-  fprintf(file, "%d", gpio_direction);
+  fprintf(file, "%s", gpio_direction == GPIO_PIN_INPUT ? "in" : "out");
   fclose(file);
   fprintf(stderr, "[gpio] pin %d direction set to %s\n", gpio_pin, gpio_direction == GPIO_PIN_INPUT ? "input" : "output");
 
