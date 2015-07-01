@@ -376,6 +376,9 @@ uint8_t rf24_initialize(rf24_t * this, char * spi_dev, uint8_t ce_pin, uint8_t i
   /* Disable dynamic payloads, to match dynamic_payloads_enabled setting */
   rf24_write_register(this, DYNPD, 0);
 
+  /* turn off all rxpipes until opened */
+  rf24_write_register(this, EN_RXADDR, 0);
+
   /* Notice reset and flush is the last thing we do */
   rf24_write_register(this, STATUS, _BV(RX_DR) | _BV(TX_DS) | _BV(MAX_RT) );
 
