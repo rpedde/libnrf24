@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <poll.h>
+#include <sys/epoll.h>
 #include <sys/ioctl.h>
 #include <assert.h>
 #include "gpio.h"
@@ -173,11 +173,12 @@ uint8_t gpio_read(uint8_t gpio_pin)
 uint8_t gpio_poll(uint8_t gpio_pin, uint8_t gpio_edge, void(* callback)(void * arg), void * arg)
 {
   char gpio_file[32];
-  struct pollfd polls;
+  struct epoll_event events, ev;
 
   int32_t fd;
   uint32_t count;
   uint8_t i, ret, val;
+  int epfd;
 
   if (gpio_export_wait(gpio_pin) == -1) { return -1; }
   if (gpio_set_direction(gpio_pin, GPIO_PIN_INPUT) == -1) { return -1; }
@@ -190,13 +191,23 @@ uint8_t gpio_poll(uint8_t gpio_pin, uint8_t gpio_edge, void(* callback)(void * a
     return -1;
   }
 
-  polls.fd = fd;
-  polls.events = POLLPRI;
+  ev.events = EPOLLIN | EPOLLET | EPOLLPRI;
+  ev.data.fd = fd;
+
+  if((epfd = epoll_create(1)) == -1) {
+      perror("[gpio] epoll_create");
+      return -1;
+  }
+
+  if(epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev) == -1) {
+      perror("[gpio] epoll_ctl");
+      return -1;
+  }
 
   ret = 0;
 
   while(1) {
-    ret = poll(&polls, 1, -1) ;
+    ret = epoll_wait(epfd, &events, 1, -1);
 
     if (ret == -1) {
       fprintf(stderr, "[gpio] Error polling /sys/class/gpio/gpio%d/value.\n", gpio_pin);
@@ -209,7 +220,8 @@ uint8_t gpio_poll(uint8_t gpio_pin, uint8_t gpio_edge, void(* callback)(void * a
       callback(arg);
     }
   }
-
+  epoll_ctl(epfd, EPOLL_CTL_DEL, fd, &ev);
+  close(epfd);
   close(fd);
 
   return ret;
