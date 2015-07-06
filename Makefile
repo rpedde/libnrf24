@@ -1,6 +1,13 @@
-CC = arm-linux-gnueabihf-gcc
-#CC	= gcc
-CFLAGS	= -g -gdwarf-2 -Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s
+ifeq ($(shell uname -m),armv6l)
+  CC = arm-linux-gnueabihf-gcc
+  CFLAGS = -g -gdwarf-2 -Ofast -mfpu=vfp -mfloat-abi=hard -march=armv6zk -mtune=arm1176jzf-s
+else
+  ifeq ($(shell uname -m),armv7l)
+    CC = gcc
+    CFLAGS = -g -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -fPIC
+  endif
+endif
+
 CPPFLAGS = -Iinclude
 LDFLAGS  = -L.
 LDLIBS   = -lnrf24
