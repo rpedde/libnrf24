@@ -8,6 +8,7 @@ else
   endif
 endif
 
+PREFIX   ?= /usr/local
 CPPFLAGS = -Iinclude
 LDFLAGS  = -L.
 LDLIBS   = -lnrf24
@@ -19,6 +20,12 @@ all: lib examples
 
 lib: src/gpio.o src/spi.o src/rf24.o
 	$(CC) $(CPPFLAGS) -o $(NAME).so -shared -fPIC $(CFLAGS) src/gpio.o src/spi.o src/rf24.o
+
+install: lib
+	install -d $(DESTDIR)$(PREFIX)/lib
+	install -d $(DESTDIR)$(PREFIX)/include
+	install -m 755 -o root -g root $(NAME).so $(DESTDIR)$(PREFIX)/lib/$(NAME).so
+	install -m 644 -o root -g root include/* $(DESTDIR)$(PREFIX)/include
 
 examples: pong_irq pong_curl
 
